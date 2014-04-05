@@ -20,4 +20,17 @@ These are the TODO items. Feel free to contribute.
 
         var WindowsAzure = require('modules/WindowsAzure');
         var mClient = new WindowsAzure.MobileServiceClient('https://my-azure-app.azure-mobile.net/','my-azure-secret');
+        
+3. Login :
 
+
+		mClient.login(WindowsAzure.MobileServiceAuthenticationProvider.Facebook,'CAAHn3...',
+			function(_error,_user){
+				if(_error){
+					//handle _error
+				}
+				else{
+					//_user.getUserId() and _user.getAuthenticationToken() available
+				}
+			}
+		);
