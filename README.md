@@ -183,7 +183,7 @@ These are the TODO items. Feel free to contribute.
 
 
 
-		mClient.invokePatchApi('api_name',
+		mClient.invokeDeleteApi('api_name',
 			{
 				'url_param_1' : 'ideally an id to uniquely identify the object to delete',
 				'url_param_2' : 'may be u need 2 values to uniquely identify the object'
