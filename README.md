@@ -93,3 +93,107 @@ These are the TODO items. Feel free to contribute.
 					//successful
 				}
 		});
+		
+		
+4. Calling custom API by HTTP GET:
+
+
+
+		mClient.invokeGetApi('api_name',{
+				'url_param_1' : 'some value',
+				'url_param_2' : 'other value'
+			},
+			function(_error,_obj){
+				if(_error){
+					//handle _error
+				}
+				else{
+					//_obj is the GET response.
+				}
+			}
+		);
+		
+4. Calling custom API by HTTP POST:
+
+
+
+		mClient.invokePostApi('api_name',{
+				'req_body_1' : 'some value',
+				'req_body_2' : 'this can be a complex object'
+			},
+			function(_error,_obj){
+				if(_error){
+					//handle _error
+				}
+				else{
+					//_obj is the POST response.
+				}
+			}
+		);
+		
+		
+4. Calling custom API by HTTP PUT:
+
+
+
+		mClient.invokePutApi('api_name',{
+				'req_body_1' : 'some value to be updated',
+				'req_body_2' : 'this can be a complex object'
+			},
+			{
+				'url_param_1' : 'ideally an id to uniquely identify the object to update',
+				'url_param_2' : 'some other value'
+			}
+			function(_error,_obj){
+				if(_error){
+					//handle _error
+				}
+				else{
+					//_obj is the PUT response.
+				}
+			}
+		);
+		
+		
+4. Calling custom API by HTTP PATCH:
+
+
+
+		mClient.invokePatchApi('api_name',{
+				'req_body_1' : 'some value to be updated',
+				'req_body_2' : 'this can be a complex object'
+			},
+			{
+				'url_param_1' : 'ideally an id to uniquely identify the object to update',
+				'url_param_2' : 'some other value'
+			}
+			function(_error,_obj){
+				if(_error){
+					//handle _error
+				}
+				else{
+					//_obj is the PATCH response.
+				}
+			}
+		);
+		
+		
+		
+4. Calling custom API by HTTP DELETE:
+
+
+
+		mClient.invokePatchApi('api_name',
+			{
+				'url_param_1' : 'ideally an id to uniquely identify the object to delete',
+				'url_param_2' : 'may be u need 2 values to uniquely identify the object'
+			}
+			function(_error,_obj){
+				if(_error){
+					//handle _error
+				}
+				else{
+					//_obj is the DELETE response.
+				}
+			}
+		);
