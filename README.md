@@ -24,7 +24,7 @@ These are the TODO items. Feel free to contribute.
 3. Login :
 
 
-		mClient.login(WindowsAzure.MobileServiceAuthenticationProvider.Facebook,'CAAHn3...',
+		mClient.login(WindowsAzure.MobileServiceAuthenticationProvider.Facebook,'facebook_access_token',
 			function(_error,_user){
 				if(_error){
 					//handle _error
