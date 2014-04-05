@@ -2,7 +2,7 @@ AzureSDK for Titanium Mobile Applications
 =================
 
 ### oAuth flow
-1.  Verify the identity of the user by the native app and get a access_token.
+1.  Verify the identity of the user by the native app, i.e., facebook and get a access_token.
 2.  Use the access_token to login.
 
 ### TODOs
