@@ -34,3 +34,15 @@ These are the TODO items. Feel free to contribute.
 				}
 			}
 		);
+4. Look up a table by the primary id :
+
+
+
+		mClient.getTable('my-table-name').lookUp('unique-primary-key',function(_error,_obj){
+				if(_error){
+					//handle _error
+				}
+				else{
+					//_obj.column_name to access each column of the row
+				}
+		});
