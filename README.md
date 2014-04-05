@@ -43,6 +43,22 @@ These are the TODO items. Feel free to contribute.
 					//handle _error
 				}
 				else{
-					//_obj.column_name to access each column of the row
+					//_obj.column_name to access each column of the returned row
+				}
+		});
+		
+5. Insert to a table :
+
+
+
+		mClient.getTable('my-table-name').insert({
+			'column_1': 'column_1_value',
+			'column_2': 'column_2_value'
+		},function(_error,_obj){
+				if(_error){
+					//handle _error
+				}
+				else{
+					//_obj.column_name to access each column of the newly inserted row
 				}
 		});
