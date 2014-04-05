@@ -68,8 +68,64 @@ function LoginManager(mobileServiceClient) {
 	};
 };
 
-
-
+function MobileServiceTable(name, mobileServiceClient){
+	if(!name || !mobileServiceClient) throw new Error("The name of the table and a mobileServiceClient is required.");
+	var TABLE_URL = "tables/";
+	this._execute=function(httpMethod, id, requestBody, requestParam, callBack){
+		if(!httpMethod || !callBack) new Error("Both httpMethod and callBack are required");
+		
+		else{
+			var xhr = Titanium.Network.createHTTPClient();
+			xhr.setTimeout(mobileServiceClient.REQUEST_TIMEOUT);
+			xhr.onload=function() {
+				var o = JSON.parse(this.responseText);
+				if(o && o['error']) callBack(o['error'],null);
+				else callBack(null,o);
+			};
+			xhr.onerror= function(e) {
+				callBack(e,null);
+			};
+			var url=mobileServiceClient.getAppUrl()+TABLE_URL+name;
+			if(id) url += '/'+id;
+			if(requestParam) url+='?'+mobileServiceClient.buildHttpQuery(requestParam);
+			xhr.open(httpMethod, url);
+			xhr.setRequestHeader("Content-Type", "application/json");
+			xhr.setRequestHeader("Accept", "application/json");
+			xhr.setRequestHeader("X-ZUMO-APPLICATION",mobileServiceClient.getAppKey());
+			if(mobileServiceClient.getCurrentUser() && mobileServiceClient.getCurrentUser().getAuthenticationToken())
+				xhr.setRequestHeader("X-ZUMO-AUTH", mobileServiceClient.getCurrentUser().getAuthenticationToken());
+			if(requestBody) xhr.send(JSON.stringify(requestBody));
+			else xhr.send();
+		}
+	};
+}
+MobileServiceTable.prototype.lookUp=function(id,callBack){
+	if(!id){
+		callBack("id is required.");
+	}
+	else{
+		this._execute(MobileServiceHTTPMethods.GET, id, null, null, callBack);
+	}
+};
+MobileServiceTable.prototype.insert=function(obj,callBack){
+	this._execute(MobileServiceHTTPMethods.POST, null, obj, null, callBack);
+};
+MobileServiceTable.prototype.update=function(id, obj,callBack){
+	if(!id || !obj){
+		callBack("id and a obj with at lease one property is required.");
+	}
+	else{
+		this._execute(MobileServiceHTTPMethods.PATCH, id, obj, null, callBack);
+	}
+};
+MobileServiceTable.prototype.del=function(id, callBack){
+	if(!id){
+		callBack("id and a obj with at lease one property is required.");
+	}
+	else{
+		this._execute(MobileServiceHTTPMethods.DELETE, id, null, null, callBack);
+	}
+};
 function MobileServiceClient(appUrl, appKey) {
 	if (!appUrl || !appKey){
 		throw new Error("Both appUrl and appKey are required.");
@@ -114,24 +170,25 @@ function MobileServiceClient(appUrl, appKey) {
 	};
 	this.invokeApi=function(apiName, httpMethod, requestBody, requestParam, callBack){
 		if(!apiName || !httpMethod || !callBack) new Error("apiName, httpMethod, and callBack are required");
-		if(!mobileServiceUser) callBack("User not logged in", null);
 		else{
 			var xhr = Titanium.Network.createHTTPClient();
 			xhr.setTimeout(this.REQUEST_TIMEOUT);
 			xhr.onload=function() {
 				var o = JSON.parse(this.responseText);
-				if(o['error']) callBack(o['error'],null);
+				if(o && o['error']) callBack(o['error'],null);
 				else callBack(null,o);
 			};
-			xhr.onerror= function() {
-				callBack("Error occured while calling the api",null);
+			xhr.onerror= function(e) {
+				callBack(e,null);
 			};
 			var url=appUrl+CUSTOM_API_URL+apiName;
 			if(requestParam) url+='?'+this.buildHttpQuery(requestParam);
 			xhr.open(httpMethod, url);
 			xhr.setRequestHeader("Content-Type", "application/json");
 			xhr.setRequestHeader("Accept", "application/json");
-			xhr.setRequestHeader("X-ZUMO-AUTH", mobileServiceUser.getAuthenticationToken());
+			xhr.setRequestHeader("X-ZUMO-APPLICATION",appKey);
+			if(mobileServiceUser && mobileServiceUser.getAuthenticationToken())
+				xhr.setRequestHeader("X-ZUMO-AUTH", mobileServiceUser.getAuthenticationToken());
 			if(requestBody) xhr.send(JSON.stringify(requestBody));
 			else xhr.send();
 		}
@@ -152,6 +209,9 @@ MobileServiceClient.prototype.invokePutApi=function(apiName, requestBody, reques
 };
 MobileServiceClient.prototype.invokeDeleteApi=function(apiName, requestParam, callBack){
 	this.invokeApi(apiName, MobileServiceHTTPMethods.DELETE, requestParam, callBack);
+};
+MobileServiceClient.prototype.getTable=function(name){
+	return new MobileServiceTable(name,this);
 };
 MobileServiceClient.prototype.buildHttpQuery=function(formdata, numeric_prefix, arg_separator) {
     var value, key, tmp = [],
