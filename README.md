@@ -62,3 +62,34 @@ These are the TODO items. Feel free to contribute.
 					//_obj.column_name to access each column of the newly inserted row
 				}
 		});
+		
+5. Update a row of a table :
+
+
+
+		mClient.getTable('my-table-name').update('unique-primary-key',
+		{
+			'column_1': 'updated_1_value',
+			'column_2': 'updated_2_value'
+		},
+		function(_error,_obj){
+				if(_error){
+					//handle _error
+				}
+				else{
+					//_obj.column_name to access each column of the updated row
+				}
+		});
+
+4. Delete a row from a table by the primary id :
+
+
+
+		mClient.getTable('my-table-name').del('unique-primary-key',function(_error,_obj){
+				if(_error){
+					//handle _error
+				}
+				else{
+					//successful
+				}
+		});
