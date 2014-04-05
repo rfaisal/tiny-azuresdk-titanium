@@ -31,6 +31,8 @@ function LoginManager(mobileServiceClient) {
 	var USER_JSON_PROPERTY = "user";
 	var ERROR_JSON_PROPERTY = "error";
 	
+	var customClaims = null;
+	
 	var createUser = function(jsonUserObj){
 		if(!jsonUserObj) throw new Error("Cannot create a user from a null object");
 		if(!jsonUserObj[USER_JSON_PROPERTY]) throw new Error(USER_JSON_PROPERTY + " property expected");
@@ -62,9 +64,20 @@ function LoginManager(mobileServiceClient) {
 		xhr.open(MobileServiceHTTPMethods.POST, mobileServiceClient.getAppUrl()+LOGIN_URL+provider);
 		xhr.setRequestHeader("Content-Type", "application/json");
 		xhr.setRequestHeader("Accept", "application/json");
-		xhr.send({
+		var bdy = {
 		    "access_token" : token
-		});
+		};
+		if(customClaims){
+			for (var att in customClaims) { 
+				if(att !== "access_token")
+					bdy[att] = customClaims[att]; 
+			}
+		}
+		xhr.send(bdy);
+	};
+	this.enableClaimBasedAuth=function(newUrl, claims){
+		LOGIN_URL = newUrl;
+		customClaims = claims;
 	};
 };
 
@@ -130,15 +143,21 @@ function MobileServiceClient(appUrl, appKey) {
 	if (!appUrl || !appKey){
 		throw new Error("Both appUrl and appKey are required.");
 	}
+	if(appUrl.charAt(appUrl.length-1) != '/'){
+		appUrl+='/';
+	}
 	
 	var CUSTOM_API_URL = "api/";
 	
-	if(appUrl.charAt(appUrl.length-1) != '/'){
-		appUrl+='/';
-	} 
 	var loginManager = new LoginManager(this);
 	var loginInProgress = false;
 	var mobileServiceUser = null;
+	this.enableClaimBasedAuth=function(newUrl, claims){
+		if (!newUrl){
+			throw new Error("A newUrl for the login endpoint is required.");
+		}
+		loginManager.enableClaimBasedAuth(newUrl,claims);
+	};
 	this.login=function(provider, oAuthToken, callBack) {
 		if (!provider || !oAuthToken || !callBack){
 			throw new Error("All provider, oAuthToken, and callBack are required.");
@@ -153,6 +172,7 @@ function MobileServiceClient(appUrl, appKey) {
 			}
 		});
 	};
+	
 	this.logout=function() {
 		mobileServiceUser = null;
 	};
@@ -165,8 +185,14 @@ function MobileServiceClient(appUrl, appKey) {
 	this.isLoginInProgress=function() {
 		return loginInProgress;
 	};
+	this.isLoggedIn=function(){
+		return mobileServiceUser != null;
+	}; 
 	this.getCurrentUser=function() {
 		return mobileServiceUser;
+	};
+	this.modifyLoginURL=function(newUrl){
+		loginManager.modifyLoginURL(newUrl);
 	};
 	this.invokeApi=function(apiName, httpMethod, requestBody, requestParam, callBack){
 		if(!apiName || !httpMethod || !callBack) new Error("apiName, httpMethod, and callBack are required");
@@ -195,6 +221,10 @@ function MobileServiceClient(appUrl, appKey) {
 	};
 }
 MobileServiceClient.prototype.REQUEST_TIMEOUT=30000;
+MobileServiceClient.prototype.loginWithClaims=function(provider, oAuthToken, newUrl, claims, callBack) {
+	this.enableClaimBasedAuth(newUrl,claims);
+	this.login(provider, oAuthToken,callBack);
+};
 MobileServiceClient.prototype.invokeGetApi=function(apiName, requestParam, callBack){
 	this.invokeApi(apiName, MobileServiceHTTPMethods.GET, null, requestParam, callBack);
 };
