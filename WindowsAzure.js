@@ -152,6 +152,7 @@ function MobileServiceClient(appUrl, appKey) {
 	var loginManager = new LoginManager(this);
 	var loginInProgress = false;
 	var mobileServiceUser = null;
+
 	this.enableClaimBasedAuth=function(newUrl, claims){
 		if (!newUrl){
 			throw new Error("A newUrl for the login endpoint is required.");
@@ -175,6 +176,10 @@ function MobileServiceClient(appUrl, appKey) {
 	
 	this.logout=function() {
 		mobileServiceUser = null;
+		var fb=require('facebook');
+		if(fb.onFacebookLogin)
+			fb.removeEventListener('login', fb.onFacebookLogin);
+		fb.logout();
 	};
 	this.getAppKey=function() {
 		return appKey;
@@ -221,9 +226,42 @@ function MobileServiceClient(appUrl, appKey) {
 	};
 }
 MobileServiceClient.prototype.REQUEST_TIMEOUT=30000;
+MobileServiceClient.prototype.initFacebook=function(fbAppId, permissions) {
+	var fb=require('facebook');
+	fb.appid = fbAppId;
+	fb.permissions = permissions || [];
+	fb.forceDialogAuth = false;
+};
+
+MobileServiceClient.prototype.loginByFacebook=function(callBack) {
+	var self = this;
+	var fb=require('facebook');
+	if (!callBack){
+		throw new Error("A callBack is required.");
+	}
+	if(!fb.appid){
+		callBack("Facebook is not initialized. Call initFacebook function before login.");
+	}
+	else{
+		fb.onFacebookLogin = function(e) {
+		    if (e.success) {
+		        self.login(MobileServiceAuthenticationProvider.Facebook, fb.getAccessToken(), callBack);
+		    }
+		    else if(e.error){
+		    	callBack(e.error);
+		    }
+		};
+		fb.addEventListener('login', fb.onFacebookLogin);
+		fb.authorize();
+	}
+};
 MobileServiceClient.prototype.loginWithClaims=function(provider, oAuthToken, newUrl, claims, callBack) {
 	this.enableClaimBasedAuth(newUrl,claims);
 	this.login(provider, oAuthToken,callBack);
+};
+MobileServiceClient.prototype.loginWithClaimsByFacebook=function(newUrl, claims, callBack) {
+	this.enableClaimBasedAuth(newUrl,claims);
+	this.loginByFacebook(callBack);
 };
 MobileServiceClient.prototype.invokeGetApi=function(apiName, requestParam, callBack){
 	this.invokeApi(apiName, MobileServiceHTTPMethods.GET, null, requestParam, callBack);
