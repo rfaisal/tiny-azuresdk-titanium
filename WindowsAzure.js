@@ -174,12 +174,27 @@ function MobileServiceClient(appUrl, appKey) {
 		});
 	};
 	
-	this.logout=function() {
-		mobileServiceUser = null;
-		var fb=require('facebook');
-		if(fb.onFacebookLogin)
-			fb.removeEventListener('login', fb.onFacebookLogin);
-		fb.logout();
+	this.logout=function(callBack) {
+		if (!callBack){
+			throw new Error("A callBack is required.");
+		}
+		else{
+			var fb=require('facebook');
+			if(fb.appid){ //login with facebook is used
+				fb.addEventListener('logout', function onFbLogout(){
+					fb.removeEventListener('logout', onFbLogout);
+					if(fb.onFacebookLogin)
+						fb.removeEventListener('login', fb.onFacebookLogin);
+					mobileServiceUser = null;
+					callBack();
+				});
+				fb.logout();
+			}
+			else{
+				mobileServiceUser = null;
+			}
+		}
+		
 	};
 	this.getAppKey=function() {
 		return appKey;
@@ -243,16 +258,23 @@ MobileServiceClient.prototype.loginByFacebook=function(callBack) {
 		callBack("Facebook is not initialized. Call initFacebook function before login.");
 	}
 	else{
-		fb.onFacebookLogin = function(e) {
-		    if (e.success) {
-		        self.login(MobileServiceAuthenticationProvider.Facebook, fb.getAccessToken(), callBack);
-		    }
-		    else if(e.error){
-		    	callBack(e.error);
-		    }
-		};
-		fb.addEventListener('login', fb.onFacebookLogin);
-		fb.authorize();
+		if(fb.getLoggedIn()){
+			Ti.API.info('Already Loggedin to Facebook');
+			self.login(MobileServiceAuthenticationProvider.Facebook, fb.getAccessToken(), callBack);
+		}
+		else{
+			fb.onFacebookLogin = function(e) {
+			    if (e.success) {
+			    	Ti.API.info('On Facebook Login Event Listener');
+			        self.login(MobileServiceAuthenticationProvider.Facebook, fb.getAccessToken(), callBack);
+			    }
+			    else if(e.error){
+			    	callBack(e.error);
+			    }
+			};
+			fb.addEventListener('login', fb.onFacebookLogin);
+			fb.authorize();
+		}
 	}
 };
 MobileServiceClient.prototype.loginWithClaims=function(provider, oAuthToken, newUrl, claims, callBack) {
