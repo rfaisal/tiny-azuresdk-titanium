@@ -62,7 +62,6 @@ function LoginManager(mobileServiceClient) {
 			callBack(e1);
 		};
 		xhr.open(MobileServiceHTTPMethods.POST, mobileServiceClient.getAppUrl()+LOGIN_URL+provider);
-		xhr.setRequestHeader("Content-Type", "application/json");
 		xhr.setRequestHeader("Accept", "application/json");
 		var bdy = {
 		    "access_token" : token
