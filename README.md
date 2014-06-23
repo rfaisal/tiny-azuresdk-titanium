@@ -14,11 +14,11 @@ These are the TODO items. Feel free to contribute.
 4.  Add support for Admin level access.
  
 ### Usage
-1. Download `WindowsAzure.js` and put it in the `Resources\modules\` directory.
+1. Download `WindowsAzure.js` and put it in the `Resources/lib/` directory.
 2. Initialize :
 
 
-        var WindowsAzure = require('modules/WindowsAzure');
+        var WindowsAzure = require('lib/WindowsAzure');
         var mClient = new WindowsAzure.MobileServiceClient('https://my-azure-app.azure-mobile.net/','my-azure-secret');
         
 3. Login :
