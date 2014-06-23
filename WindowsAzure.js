@@ -297,7 +297,7 @@ MobileServiceClient.prototype.invokePutApi=function(apiName, requestBody, reques
 	this.invokeApi(apiName, MobileServiceHTTPMethods.PUT, requestBody, requestParam, callBack);
 };
 MobileServiceClient.prototype.invokeDeleteApi=function(apiName, requestParam, callBack){
-	this.invokeApi(apiName, MobileServiceHTTPMethods.DELETE, requestParam, callBack);
+	this.invokeApi(apiName, MobileServiceHTTPMethods.DELETE, null, requestParam, callBack);
 };
 MobileServiceClient.prototype.getTable=function(name){
 	return new MobileServiceTable(name,this);
