@@ -276,6 +276,30 @@ MobileServiceClient.prototype.loginByFacebook=function(callBack) {
 		}
 	}
 };
+MobileServiceClient.prototype.extendFacebookPermissions=function(permissionsArray, callBack) {
+	var self = this;
+	var fb=require('facebook');
+	if (!callBack){
+		throw new Error("A callBack is required.");
+	}
+	if(!fb.appid){
+		callBack("Facebook is not initialized. Call initFacebook function before login.");
+	}
+	else{
+		fb.reauthorize(permissionsArray, 'me', function(e){
+	        if (e.success) {
+	            self.loginByFacebook(callBack);
+	        } else {
+	            if (e.error) {
+	                callBack(e.error);
+	            } else {
+	            	allBack("Unknown result");
+	            }
+	        }
+	    });
+	}
+	
+};
 MobileServiceClient.prototype.loginWithClaims=function(provider, oAuthToken, newUrl, claims, callBack) {
 	this.enableClaimBasedAuth(newUrl,claims);
 	this.login(provider, oAuthToken,callBack);
