@@ -139,6 +139,10 @@ MobileServiceTable.prototype.del=function(id, callBack){
 	}
 };
 function MobileServiceClient(appUrl, appKey) {
+	this.init(appUrl, appKey);
+}
+MobileServiceClient.prototype.init = function(appUrl, appKey) 
+{
 	if (!appUrl || !appKey){
 		throw new Error("Both appUrl and appKey are required.");
 	}
@@ -238,7 +242,7 @@ function MobileServiceClient(appUrl, appKey) {
 			else xhr.send();
 		}
 	};
-}
+};
 MobileServiceClient.prototype.REQUEST_TIMEOUT=30000;
 MobileServiceClient.prototype.initFacebook=function(fbAppId, permissions) {
 	var fb=require('facebook');
