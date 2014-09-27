@@ -243,7 +243,7 @@ MobileServiceClient.prototype.init = function(appUrl, appKey)
 		}
 	};
 };
-MobileServiceClient.prototype.REQUEST_TIMEOUT=30000;
+MobileServiceClient.prototype.REQUEST_TIMEOUT=90000;
 MobileServiceClient.prototype.initFacebook=function(fbAppId, permissions) {
 	var fb=require('facebook');
 	fb.appid = fbAppId;
