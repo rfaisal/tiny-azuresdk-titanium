@@ -8,10 +8,8 @@ AzureSDK for Titanium Mobile Applications
 ### TODOs
 These are the TODO items. Feel free to contribute.
 
-1.  Add options for specifying columns when getiing table data (currently returns all the columns), under development.
-2.  Add support for returning multiple rows of a table beased on search (currently returns one row based on the id), under development.
-3.  Currently only supports facebook, add other identity providers.
-4.  Add support for Admin level access.
+1.  Currently only supports facebook, add other identity providers.
+2.  Add support for Admin level access.
  
 ### Usage
 1. Download `WindowsAzure.js` and put it in the `Resources/lib/` directory.
@@ -34,10 +32,11 @@ These are the TODO items. Feel free to contribute.
 				}
 			}
 		);
-4. Look up a table by the primary id :
+4. Look up a table :
 
 
-
+		// by the primary id
+		// Depricated: this method is depricated since version 1.1.0, use MobileServiceTable.prototype.select instead
 		mClient.getTable('my-table-name').lookUp('unique-primary-key',function(_error,_obj){
 				if(_error){
 					//handle _error
@@ -46,6 +45,18 @@ These are the TODO items. Feel free to contribute.
 					//_obj.column_name to access each column of the returned row
 				}
 		});
+		
+		mClient.getTable('my-table-name').select(function(_error,_obj){
+		        if(_error){
+					//handle _error
+				}
+				else{
+					//_obj.column_name to access each column of the returned row
+				}
+		}, 
+		'unique-primary-key : put null for all rows',
+		['column_name_1','column_name_1'], // put null to return all the columns
+		'(column_1 eq some_value)'); // where string, look: http://msdn.microsoft.com/en-us/library/azure/jj677199.aspx
 		
 5. Insert to a table :
 

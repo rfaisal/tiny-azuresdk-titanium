@@ -111,6 +111,9 @@ function MobileServiceTable(name, mobileServiceClient){
 		}
 	};
 }
+/**
+ * Depricated: this method is depricated since version 1.1.0, use MobileServiceTable.prototype.select instead
+ */
 MobileServiceTable.prototype.lookUp=function(id,callBack){
 	if(!id){
 		callBack("id is required.");
@@ -118,6 +121,21 @@ MobileServiceTable.prototype.lookUp=function(id,callBack){
 	else{
 		this._execute(MobileServiceHTTPMethods.GET, id, null, null, callBack);
 	}
+};
+/**
+ * id : unique id of the table
+ * columns : array of column names to select
+ * filter_string : where clause, http://msdn.microsoft.com/en-us/library/azure/jj677199.aspx 
+ */
+MobileServiceTable.prototype.select=function(callBack, id, columns, filter_string){
+	var _obj = {};
+	if(columns && columns.length > 0){
+		_obj['$select'] = columns.join();
+	}
+	if(filter_string && filter_string != ''){
+		_obj['$filter'] = filter_string;
+	}
+	this._execute(MobileServiceHTTPMethods.GET, id, null, _obj, callBack);
 };
 MobileServiceTable.prototype.insert=function(obj,callBack){
 	this._execute(MobileServiceHTTPMethods.POST, null, obj, null, callBack);
@@ -381,5 +399,5 @@ MobileServiceClient.prototype.buildHttpQuery=function(formdata, numeric_prefix, 
 exports.MobileServiceHTTPMethods=MobileServiceHTTPMethods;
 exports.MobileServiceClient = MobileServiceClient; 
 exports.MobileServiceAuthenticationProvider=MobileServiceAuthenticationProvider;
-exports.version = '1.0.0';
+exports.version = '1.1.0';
 exports.author = 'Faisal Rahman';
